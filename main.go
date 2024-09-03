@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gocolly/colly"
 )
@@ -50,6 +52,30 @@ func main() {
 		c.Visit("https://finance.yahoo.com/quote/" + t + "/")
 	}
 
-	println(ticker)
-	println(stocks)
+	fmt.Println(stocks)
+
+	file, err := os.Create("stocks.csv")
+	if err != nil {
+		log.Fatalln("Failed to create ouput csv file", err)
+	}
+	defer file.Close()
+	writer := csv.NewWriter(file)
+	headers := []string{
+		"comapny",
+		"price",
+		"change",
+	}
+	writer.Write(headers)
+	for _, stock := range stocks {
+		record := []string{
+			stock.company,
+			stock.price,
+			stock.change,
+		}
+		writer.Write(record)
+
+	}
+	defer writer.Flush()
+
+
 }
